@@ -29,6 +29,27 @@ function identifySelectors(ignore) {
 }
 
 /**
+ * Identify ignored declarations
+ * @param {array} ignore
+ * @returns {Function}
+ */
+function identifyDeclarations(ignore) {
+	return function (declaration) {
+		for (var i = 0; i < ignore.length; ++i) {
+			/* If ignore is RegExp and matches declaration value ... */
+			if (_.isRegExp(ignore[i]) && ignore[i].test(declaration)) {
+				console.log(ignore);
+				return true;
+			}
+			if (ignore[i] === declaration) {
+				return true;
+			}
+		}
+		return false;
+	};
+}
+
+/**
  *
  * @param ignore
  * @returns {Function}
@@ -55,6 +76,12 @@ function reduceRules(ignore) {
 
 			if (_.size(rule.selectors)) {
 				rules.push(rule);
+			}
+
+				// console.log(rule);
+
+			if (rule.declarations === 'declaration') {
+				rule.declarations = _.reject(rule.declarations || [], identifyDeclarations(ignore));
 			}
 		} else {
 			rules.push(rule);
